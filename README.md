@@ -47,3 +47,22 @@ El sistema se divide en los siguientes bloques:
 - Modulación **OOK**
 - Fotodiodo o fototransistor
 - **Python** (opcional, interfaz de usuario)
+
+- stateDiagram-v2
+    direction LR
+    
+    IDLE: <b>IDLE (Reposo)</b><br/>Esperando señal tx_start<br/>Salida = '1' (Láser OFF)
+
+    START: <b>START (Inicio)</b><br/>Genera Bit de Inicio (0)<br/>Activa PWM 38kHz
+
+    DATA: <b>DATA (Datos)</b><br/>Envía bits 0 al 7<br/>Si bit='0' -> 38kHz<br/>Si bit='1' -> OFF
+
+    STOP: <b>STOP (Parada)</b><br/>Genera Bit de Parada (1)<br/>Láser OFF (Silencio)
+
+    [*] --> IDLE
+    IDLE --> START : tx_start = '1'
+    START --> DATA : Fin tiempo bit
+    DATA --> DATA : Siguiente bit (i < 7)
+    DATA --> STOP : i = 7 (Fin byte)
+    STOP --> IDLE : Fin tiempo Stop
+    
