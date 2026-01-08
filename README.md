@@ -131,6 +131,7 @@ El sensor óptico entrega una señal serial que puede contener ruido.
 El módulo UART RX valida el inicio, muestrea los bits y reconstruye el byte recibido antes de entregarlo como dato válido.
 
 🌀 Máquina de Estados – UART RX (circular)
+```mermaid
 
 stateDiagram-v2  
 direction LR  
@@ -147,6 +148,7 @@ START : VALIDACIÓN / Mitad de bit
 DATA : LECTURA / Bits 0–7  
 STOP : CIERRE / Bit de parada  
 CLEANUP : ENTREGA / rx_ready = 1  
+```
 
 Este bloque siempre vuelve a **IDLE**, quedando listo para recibir el siguiente carácter.
 
@@ -165,7 +167,7 @@ El UART TX toma el byte recibido y lo envía a la computadora siguiendo el proto
 Al finalizar la transmisión, vuelve automáticamente al estado de reposo.
 
 🌀 Máquina de Estados – UART TX (circular)
-
+```mermaid
 stateDiagram-v2  
 direction LR  
 
@@ -180,6 +182,7 @@ START : INICIO / Bit de arranque
 DATA : ENVÍO / Serialización  
 STOP : PARADA / Bit final  
 CLEANUP : LIMPIEZA / Fin de envío  
+```
 
 ---
 
