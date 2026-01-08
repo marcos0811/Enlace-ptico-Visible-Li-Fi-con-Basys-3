@@ -66,23 +66,22 @@ graph LR
 
 stateDiagram-v2
     direction LR
+
     [*] --> IDLE
 
-    IDLE : bit_tx = 1\nTX_idle
-    IDLE --> START : dato_valido
+    IDLE --> START : rx = 0\n(Bit de inicio detectado)
+    IDLE : Reposo\n- Contadores en 0\n- Espera datos
 
-    START : bit_tx = 0\nBit inicio
-    START --> DATOS : tick_bit
+    START --> DATOS : rx sigue en 0\n(mitad de bit)
+    START --> IDLE : rx vuelve a 1\n(ruido)
+    START : Confirmación\n- Espera medio bit
 
-    DATOS : bit_tx = data[bit_idx]\nEnvía datos
-    DATOS --> DATOS : bit_idx < 7 && tick_bit
-    DATOS --> STOP : bit_idx == 7 && tick_bit
+    DATOS --> DATOS : bit_idx < 7\n(sigue leyendo)
+    DATOS --> STOP : bit_idx = 7\n(8 bits listos)
+    DATOS : Lectura\n- Muestreo al centro del bit\n- Guarda bits
 
-    STOP : bit_tx = 1\nBit parada
-    STOP --> PAUSA : tick_bit
-
-    PAUSA : bit_tx = 1\nSilencio
-    PAUSA --> IDLE : pausa_ok
+    STOP --> IDLE : Fin del bit de parada
+    STOP : Entrega\n- dato_valido = 1\n- Byte listo
 
 ```
 
