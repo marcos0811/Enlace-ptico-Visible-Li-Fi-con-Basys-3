@@ -220,11 +220,11 @@ CLEANUP : LIMPIEZA / Fin de envío
 - **Python** 
 ## 🧩 Maqueta del Sistema Li-Fi
 
-A continuación se muestra la maqueta física implementada del sistema Li-Fi, donde se puede observar el emisor y el receptor conectados a la FPGA, así como el uso del canal óptico para la transmisión de datos.
+A continuación se muestra la maqueta física implementada del sistema Li-Fi, donde se puede observar el emisor y el receptor, así como el uso del canal óptico para la transmisión de datos.
 
 <img width="1600" height="745" alt="image" src="https://github.com/user-attachments/assets/bcef436c-3707-4a0e-86fb-7fb48ac9bdbb" />
 
-En la maqueta se distinguen claramente el módulo de transmisión luminosa, el sensor óptico de recepción y la tarjeta FPGA, los cuales trabajan en conjunto para permitir la comunicación de datos mediante luz visible.
+En la maqueta se distinguen claramente el módulo de transmisión luminosa, el sensor óptico de recepción y la interfaz grafica para el envio de los daots, los cuales trabajan en conjunto para permitir la comunicación de datos mediante luz visible.
 
 ## 👥 Autores
 
