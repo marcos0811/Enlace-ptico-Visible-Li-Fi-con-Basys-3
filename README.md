@@ -1,5 +1,23 @@
 #  Enlace Óptico Visible Li-Fi con Basys 3
 
+**Universidad de Cuenca – Facultad de Ingeniería**  
+**Asignatura:** Programacion VHDL 
+**Período:** Septiembre 2024 – Febrero 2025  
+
+![Status](https://img.shields.io/badge/Estado-Finalizado-success?style=flat-square)
+![SDR](https://img.shields.io/badge/VHDL_One-blue?style=flat-square)
+![Amplificador](https://img.shields.io/badge/Amp-MMIC_ERA--6-orange?style=flat-square)
+![Normativa](https://img.shields.io/badge/Normativa-NTSC--M-red?style=flat-square)
+
+<div align="center">
+  <img width="100%" src="https://github.com/user-attachments/assets/e05b561b-fb34-4922-acbb-b1871a81f200" alt="Banner del Proyecto">
+</div>
+
+---
+
+
+
+
 ##  Descripción general
 
 Este proyecto consiste en la implementación de un enlace de comunicaciones ópticas de corto alcance utilizando luz visible (Li-Fi) mediante la tarjeta de desarrollo Basys 3. El sistema permite la transmisión y recepción de mensajes digitales empleando un LED o láser de alta intensidad como medio de transmisión, sin el uso de radiofrecuencia.
@@ -204,4 +222,12 @@ CLEANUP : LIMPIEZA / Fin de envío
 - Modulación **OOK**
 - Fotodiodo o fototransistor
 - **Python** 
+
+## 👥 Autores
+
+**Universidad de Cuenca – Ingeniería en Telecomunicaciones**
+
+- Eddison Paúl Espadero Morales – eddison.espadero@ucuenca.edu.ec  
+- Marcos Josué Japa Maza – marcos.japa@ucuenca.edu.ec  
+
 
