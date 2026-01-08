@@ -83,6 +83,41 @@ stateDiagram-v2
     DATOS : LECTURA- Muestrea bits\n- Guarda byte
     STOP : ENTREGA- dato_valido = 1
 ```
+
+
+## 🧠 Codificación del Dato – Codificador Li-Fi
+
+Una vez que el UART indica que el dato es válido, este pasa al codificador.
+Este bloque define cómo debe enviarse el byte por luz, aplicando un protocolo simple basado en estados.
+El codificador controla:
+-Inicio de transmisión
+-Envío de bits
+-Bit de parada
+-Pausa de seguridad
+
+### 🌀 Máquina de Estados – Codificador
+
+```mermaid
+stateDiagram-v2
+    direction LR
+
+    ESPERA --> START : dato_valido = 1
+    START --> DATOS : Tiempo de bit
+    DATOS --> STOP : Último bit enviado
+    STOP --> PAUSA : Fin de trama
+    PAUSA --> ESPERA : Tiempo cumplido
+
+    ESPERA : REPOSO- Láser apagado
+    START : INICIO- Despierta receptor
+    DATOS : ENVÍO- Bits del byte
+    STOP : CIERRE- Bit de parada
+    PAUSA : DESCANSO- Evita saturación
+
+```
+
+
+
+
 ---
 ### Máquina de estados del receptor
 (diagrama FSM + explicación)
