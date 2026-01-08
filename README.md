@@ -38,7 +38,7 @@ El sistema se divide en los siguientes bloques:
 - Visualización del mensaje recibido
 
 ---
-graph LR
+```mermaid
     A[PC Emisor] -->|UART TX| B[Basys 3<br/>UART RX]
     B -->|ASCII| C[Codificador]
     C -->|Bits| D[Modulador OOK]
@@ -54,7 +54,7 @@ graph LR
     style G fill:#cce5ff,stroke:#333,stroke-width:1.5px
     style E fill:#ffe6cc,stroke:#333,stroke-width:1.5px
     style F fill:#ffe6cc,stroke:#333,stroke-width:1.5px
-
+```
 ##  Tecnologías utilizadas
 
 - Tarjeta de desarrollo **Basys 3**
