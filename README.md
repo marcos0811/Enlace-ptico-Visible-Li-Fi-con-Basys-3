@@ -56,6 +56,42 @@ graph LR
     style E fill:#ffe6cc,stroke:#333,stroke-width:1.5px
     style F fill:#ffe6cc,stroke:#333,stroke-width:1.5px
 ```
+
+---
+
+## Funcionamiento del sistema
+### Máquina de estados del transmisor
+
+```mermaid
+
+stateDiagram-v2
+    direction LR
+    [*] --> IDLE
+
+    IDLE : bit_tx = 1\nTX_idle
+    IDLE --> START : dato_valido
+
+    START : bit_tx = 0\nBit inicio
+    START --> DATOS : tick_bit
+
+    DATOS : bit_tx = data[bit_idx]\nEnvía datos
+    DATOS --> DATOS : bit_idx < 7 && tick_bit
+    DATOS --> STOP : bit_idx == 7 && tick_bit
+
+    STOP : bit_tx = 1\nBit parada
+    STOP --> PAUSA : tick_bit
+
+    PAUSA : bit_tx = 1\nSilencio
+    PAUSA --> IDLE : pausa_ok
+
+```
+
+---
+### Máquina de estados del receptor
+(diagrama FSM + explicación)
+
+
+
 ##  Tecnologías utilizadas
 
 - Tarjeta de desarrollo **Basys 3**
