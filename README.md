@@ -82,6 +82,7 @@ stateDiagram-v2
     START : CONFIRMACION- Espera medio bit
     DATOS : LECTURA- Muestrea bits\n- Guarda byte
     STOP : ENTREGA- dato_valido = 1
+```
 ---
 ### Máquina de estados del receptor
 (diagrama FSM + explicación)
