@@ -38,6 +38,22 @@ El sistema se divide en los siguientes bloques:
 - Visualización del mensaje recibido
 
 ---
+graph LR
+    A[PC Emisor] -->|UART TX| B[Basys 3<br/>UART RX]
+    B -->|ASCII| C[Codificador]
+    C -->|Bits| D[Modulador OOK]
+    D -->|Luz Visible| E[LED / Láser]
+
+    E -->|Canal Óptico| F[Fotodiodo / Fototransistor]
+    F -->|Señal Digital| G[Basys 3<br/>Demodulador OOK]
+    G -->|Bits| H[Decodificador]
+    H -->|ASCII| I[UART TX]
+    I -->|UART RX| J[PC Receptor]
+
+    style B fill:#cce5ff,stroke:#333,stroke-width:1.5px
+    style G fill:#cce5ff,stroke:#333,stroke-width:1.5px
+    style E fill:#ffe6cc,stroke:#333,stroke-width:1.5px
+    style F fill:#ffe6cc,stroke:#333,stroke-width:1.5px
 
 ##  Tecnologías utilizadas
 
@@ -46,23 +62,5 @@ El sistema se divide en los siguientes bloques:
 - Comunicación **UART**
 - Modulación **OOK**
 - Fotodiodo o fototransistor
-- **Python** (opcional, interfaz de usuario)
+- **Python** 
 
-- stateDiagram-v2
-    direction LR
-    
-    IDLE: <b>IDLE (Reposo)</b><br/>Esperando señal tx_start<br/>Salida = '1' (Láser OFF)
-
-    START: <b>START (Inicio)</b><br/>Genera Bit de Inicio (0)<br/>Activa PWM 38kHz
-
-    DATA: <b>DATA (Datos)</b><br/>Envía bits 0 al 7<br/>Si bit='0' -> 38kHz<br/>Si bit='1' -> OFF
-
-    STOP: <b>STOP (Parada)</b><br/>Genera Bit de Parada (1)<br/>Láser OFF (Silencio)
-
-    [*] --> IDLE
-    IDLE --> START : tx_start = '1'
-    START --> DATA : Fin tiempo bit
-    DATA --> DATA : Siguiente bit (i < 7)
-    DATA --> STOP : i = 7 (Fin byte)
-    STOP --> IDLE : Fin tiempo Stop
-    
