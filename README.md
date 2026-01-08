@@ -58,28 +58,30 @@ graph LR
 ```
 
 
+## Máquina de estados del transmisor
 
-## Funcionamiento del sistema
-### Máquina de estados del transmisor
+## 📥 Recepción de Datos – UART RX (Basys 3)
+
+Cuando el usuario envía un carácter desde la PC mediante un programa en Python, este dato viaja por el enlace UART hacia la tarjeta Basys 3.  
+El módulo UART RX es el encargado de escuchar la línea serial, reconstruir el byte recibido y notificar que el dato es válido.
+
+Este módulo funciona mediante una máquina de estados circular, que siempre regresa a su estado inicial una vez que el dato ha sido recibido correctamente.
+
+### 🌀 Máquina de Estados – UART RX
 
 ```mermaid
-
 stateDiagram-v2
     direction LR
 
-    IDLE --> START : rx = 0
-    START --> DATOS : Bit inicio válido
+    IDLE --> START : Detecta bit inicio (rx = 0)
+    START --> DATOS : Inicio válido
     DATOS --> STOP : 8 bits recibidos
-    STOP --> IDLE : Bit de parada OK
+    STOP --> IDLE : Dato entregado
 
-    IDLE : ESPERA- Contadores = 0- Línea en reposo
-    START : CONFIRMA- Espera medio bit
-    DATOS : LECTURA- Muestreo\n- Guarda bits
+    IDLE : ESPERA- Línea en reposo- Contadores en cero
+    START : CONFIRMACION- Espera medio bit
+    DATOS : LECTURA- Muestrea bits\n- Guarda byte
     STOP : ENTREGA- dato_valido = 1
-
-
-```
-
 ---
 ### Máquina de estados del receptor
 (diagrama FSM + explicación)
