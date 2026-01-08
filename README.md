@@ -57,7 +57,7 @@ graph LR
     style F fill:#ffe6cc,stroke:#333,stroke-width:1.5px
 ```
 
----
+
 
 ## Funcionamiento del sistema
 ### Máquina de estados del transmisor
