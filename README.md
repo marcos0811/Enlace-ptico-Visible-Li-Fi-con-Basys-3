@@ -58,7 +58,7 @@ graph LR
 ```
 
 
-# 🔁 Máquina de Estados del Transmisor Li-Fi
+# 🔁 Máquina de Estados del Transmisor.
 
 ## 📥 Recepción de Datos – UART RX (Basys 3)
 Cuando el usuario envía un carácter desde la PC mediante un programa en Python, este dato viaja por el enlace UART hacia la tarjeta Basys 3.  
@@ -116,8 +116,80 @@ Funcionamiento:
 El modulador ejecuta directamente lo que ordena el codificador y el sistema completo siempre regresa al estado de reposo, listo para una nueva transmisión.
 
 ---
-### Máquina de estados del receptor
-(diagrama FSM + explicación)
+### Máquina de estados del receptor.
+## 📡 Máquina de Estados del Receptor Li-Fi (Sistema Puente)
+
+El receptor Li-Fi funciona como un **puente de datos**:  
+recibe la señal luminosa desde el sensor, la procesa en la FPGA y la envía directamente a la PC mediante UART.  
+Todas las etapas usan **máquinas de estados circulares**, regresando siempre al estado inicial.
+
+---
+
+## 📥 Etapa 1: Recepción Óptica y Decodificación – UART RX
+
+El sensor óptico entrega una señal serial que puede contener ruido.  
+El módulo UART RX valida el inicio, muestrea los bits y reconstruye el byte recibido antes de entregarlo como dato válido.
+
+🌀 Máquina de Estados – UART RX (circular)
+
+stateDiagram-v2  
+direction LR  
+
+IDLE --> START : Detecta bajada (rx = 0)  
+START --> DATA : Inicio válido  
+START --> IDLE : Ruido  
+DATA --> STOP : 8 bits recibidos  
+STOP --> CLEANUP : Fin de trama  
+CLEANUP --> IDLE : Reinicio  
+
+IDLE : ESPERA / Sensor en reposo  
+START : VALIDACIÓN / Mitad de bit  
+DATA : LECTURA / Bits 0–7  
+STOP : CIERRE / Bit de parada  
+CLEANUP : ENTREGA / rx_ready = 1  
+
+Este bloque siempre vuelve a **IDLE**, quedando listo para recibir el siguiente carácter.
+
+---
+
+## 🔁 Etapa 2: Puente RX ➜ TX (FPGA)
+
+Cuando el UART RX activa la señal `rx_ready`, el byte recibido se transfiere directamente al transmisor UART.  
+La FPGA **no modifica el dato**, solo actúa como un enlace inmediato entre recepción y transmisión, funcionando como un puente transparente.
+
+---
+
+## 📤 Etapa 3: Envío a la PC – UART TX
+
+El UART TX toma el byte recibido y lo envía a la computadora siguiendo el protocolo UART estándar.  
+Al finalizar la transmisión, vuelve automáticamente al estado de reposo.
+
+🌀 Máquina de Estados – UART TX (circular)
+
+stateDiagram-v2  
+direction LR  
+
+IDLE --> START : tx_start = 1  
+START --> DATA : Fin Start Bit  
+DATA --> STOP : 8 bits enviados  
+STOP --> CLEANUP : Fin Stop Bit  
+CLEANUP --> IDLE : Listo  
+
+IDLE : REPOSO / Línea en '1'  
+START : INICIO / Bit de arranque  
+DATA : ENVÍO / Serialización  
+STOP : PARADA / Bit final  
+CLEANUP : LIMPIEZA / Fin de envío  
+
+---
+
+## 🔄 Resumen del Funcionamiento del Receptor
+
+• Recibe información por luz  
+• Decodifica los datos con UART RX  
+• Reenvía inmediatamente a la PC con UART TX  
+• Todas las etapas usan máquinas de estados circulares  
+• El sistema siempre regresa al estado IDLE
 
 
 
