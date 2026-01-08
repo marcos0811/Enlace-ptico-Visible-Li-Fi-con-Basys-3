@@ -4,10 +4,6 @@
 **Asignatura:** Programacion VHDL 
 **Período:** Septiembre 2024 – Febrero 2025  
 
-![Status](https://img.shields.io/badge/Estado-Finalizado-success?style=flat-square)
-![SDR](https://img.shields.io/badge/VHDL_One-blue?style=flat-square)
-![Amplificador](https://img.shields.io/badge/Amp-MMIC_ERA--6-orange?style=flat-square)
-![Normativa](https://img.shields.io/badge/Normativa-NTSC--M-red?style=flat-square)
 
 <div align="center">
   <img width="100%" src="https://github.com/user-attachments/assets/e05b561b-fb34-4922-acbb-b1871a81f200" alt="Banner del Proyecto">
