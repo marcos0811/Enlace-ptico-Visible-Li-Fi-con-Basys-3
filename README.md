@@ -122,7 +122,7 @@ El modulador es la etapa física del sistema y no utiliza una máquina de estado
 Convierte directamente los bits digitales en luz visible.
 
 Funcionamiento:
-- Genera una portadora (por ejemplo 38 kHz)
+- Genera una portadora (38 kHz)
 - Controla el láser mediante lógica digital
 - Bit = 0 → láser activo (portadora encendida)
 - Bit = 1 → láser apagado
