@@ -58,65 +58,62 @@ graph LR
 ```
 
 
-## Máquina de estados del transmisor
+# 🔁 Máquina de Estados del Transmisor Li-Fi
 
 ## 📥 Recepción de Datos – UART RX (Basys 3)
-
 Cuando el usuario envía un carácter desde la PC mediante un programa en Python, este dato viaja por el enlace UART hacia la tarjeta Basys 3.  
-El módulo UART RX es el encargado de escuchar la línea serial, reconstruir el byte recibido y notificar que el dato es válido.
+El módulo UART RX escucha la línea serial, reconstruye el byte recibido y notifica que el dato es válido.  
+La máquina de estados es circular y siempre regresa a su estado inicial.
 
-Este módulo funciona mediante una máquina de estados circular, que siempre regresa a su estado inicial una vez que el dato ha sido recibido correctamente.
-
-### 🌀 Máquina de Estados – UART RX
-
+Máquina de estados UART RX (Mermaid):
 ```mermaid
 stateDiagram-v2
     direction LR
-
     IDLE --> START : Detecta bit inicio (rx = 0)
     START --> DATOS : Inicio válido
     DATOS --> STOP : 8 bits recibidos
     STOP --> IDLE : Dato entregado
 
-    IDLE : ESPERA- Línea en reposo- Contadores en cero
-    START : CONFIRMACION- Espera medio bit
-    DATOS : LECTURA- Muestrea bits\n- Guarda byte
-    STOP : ENTREGA- dato_valido = 1
+    IDLE : ESPERA - Línea en reposo - Contadores en cero
+    START : CONFIRMACIÓN - Espera medio bit
+    DATOS : LECTURA - Muestrea bits - Guarda byte
+    STOP : ENTREGA - dato_valido = 1
 ```
 
-
 ## 🧠 Codificación del Dato – Codificador Li-Fi
+Cuando el UART indica que el dato es válido, el byte pasa al codificador.  
+Este bloque define el protocolo de transmisión óptica: inicio, datos, parada y pausa de seguridad.  
+La máquina de estados también es circular y vuelve al estado de espera.
 
-Una vez que el UART indica que el dato es válido, este pasa al codificador.
-Este bloque define cómo debe enviarse el byte por luz, aplicando un protocolo simple basado en estados.
-El codificador controla:
--Inicio de transmisión
--Envío de bits
--Bit de parada
--Pausa de seguridad
-
-### 🌀 Máquina de Estados – Codificador
-
+Máquina de estados Codificador (Mermaid):
 ```mermaid
+
 stateDiagram-v2
     direction LR
-
     ESPERA --> START : dato_valido = 1
     START --> DATOS : Tiempo de bit
     DATOS --> STOP : Último bit enviado
     STOP --> PAUSA : Fin de trama
     PAUSA --> ESPERA : Tiempo cumplido
 
-    ESPERA : REPOSO- Láser apagado
-    START : INICIO- Despierta receptor
-    DATOS : ENVÍO- Bits del byte
-    STOP : CIERRE- Bit de parada
-    PAUSA : DESCANSO- Evita saturación
-
+    ESPERA : REPOSO - Láser apagado
+    START : INICIO - Despierta receptor
+    DATOS : ENVÍO - Bits del byte
+    STOP : CIERRE - Bit de parada
+    PAUSA : DESCANSO - Evita saturación
 ```
 
+## 💡 Modulación Óptica – Modulador OOK
+El modulador es la etapa física del sistema y no utiliza una máquina de estados.  
+Convierte directamente los bits digitales en luz visible.
 
+Funcionamiento:
+- Genera una portadora (por ejemplo 38 kHz)
+- Controla el láser mediante lógica digital
+- Bit = 0 → láser activo (portadora encendida)
+- Bit = 1 → láser apagado
 
+El modulador ejecuta directamente lo que ordena el codificador y el sistema completo siempre regresa al estado de reposo, listo para una nueva transmisión.
 
 ---
 ### Máquina de estados del receptor
