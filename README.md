@@ -72,10 +72,10 @@ stateDiagram-v2
     DATOS --> STOP : 8 bits recibidos
     STOP --> IDLE : Bit de parada OK
 
-    IDLE : ESPERA\n- Contadores = 0\n- Línea en reposo
-    START : CONFIRMA\n- Espera medio bit
-    DATOS : LECTURA\n- Muestreo\n- Guarda bits
-    STOP : ENTREGA\n- dato_valido = 1
+    IDLE : ESPERA- Contadores = 0- Línea en reposo
+    START : CONFIRMA- Espera medio bit
+    DATOS : LECTURA- Muestreo\n- Guarda bits
+    STOP : ENTREGA- dato_valido = 1
 
 
 ```
