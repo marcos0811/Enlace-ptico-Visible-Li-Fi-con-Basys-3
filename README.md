@@ -39,6 +39,7 @@ El sistema se divide en los siguientes bloques:
 
 ---
 ```mermaid
+graph LR
     A[PC Emisor] -->|UART TX| B[Basys 3<br/>UART RX]
     B -->|ASCII| C[Codificador]
     C -->|Bits| D[Modulador OOK]
