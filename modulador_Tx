@@ -1,0 +1,44 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity modulador is
+    Port (
+        clk        : in  STD_LOGIC;
+        bit_tx     : in  STD_LOGIC;   -- Viene del codificador
+        laser_out  : out STD_LOGIC
+    );
+end modulador;
+
+architecture Behavioral of modulador is
+    -- 100 MHz / (2 * 38 kHz) - 1 = 1314.78 -> 1315
+    constant CARRIER_DIV : integer := 1315; 
+    signal carrier_cnt   : integer range 0 to CARRIER_DIV := 0;
+    signal carrier       : std_logic := '0';
+begin
+
+    -- 1. Generador de 38 kHz
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            if carrier_cnt = CARRIER_DIV then
+                carrier_cnt <= 0;
+                carrier <= not carrier;
+            else
+                carrier_cnt <= carrier_cnt + 1;
+            end if;
+        end if;
+    end process;
+
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            if bit_tx = '0' then 
+                laser_out <= carrier;
+            else
+                laser_out <= '0'; 
+            end if;
+        end if;
+    end process;
+
+end Behavioral;
