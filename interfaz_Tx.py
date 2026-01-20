@@ -5,15 +5,14 @@ from tkinter import messagebox, filedialog
 from PIL import Image, ImageTk
 import threading
 import os
-import mido  # pip install mido
+import mido  
 
 # ==========================================
 #  CONFIGURACIÓN GLOBAL
 # ==========================================
-PUERTO = 'COM6'   # <--- ¡VERIFICA ESTO EN TU COMPUTADORA!
+PUERTO = 'COM6'  
 BAUDIOS = 2400
 
-# Tu Playlist exacta
 PLAYLIST = {
     1: r"C:\Users\japam\OneDrive\Documentos\Ciclos\6.Sexto Ciclo\Programacion en VHDL\musicas_mid\gorillaz-clint_eastwood.mid",
     2: r"C:\Users\japam\OneDrive\Documentos\Ciclos\6.Sexto Ciclo\Programacion en VHDL\musicas_mid\Seven_Nation_Army.mid",
@@ -54,7 +53,6 @@ def nota_midi_a_texto(note_num):
     idx = note_num % 12
     nombre = NOTAS[idx]
 
-    # Ajuste para octavas válidas (3, 4, 5)
     if octava < 3:
         octava = 3
     if octava > 5:
@@ -79,7 +77,7 @@ def detener_envio_principal():
     consola.see(tk.END)
 
 # ==========================================
-#  VENTANA DE MÚSICA (Pop-up)
+#  VENTANA DE MUSICA
 # ==========================================
 
 
@@ -89,7 +87,6 @@ def abrir_ventana_musica():
     ventana_musica.geometry("600x600")
     ventana_musica.resizable(False, False)
 
-    # --- Lista de canciones (Listbox) ---
     lbl_lista = tk.Label(
         ventana_musica, text="Selecciona una canción:", font=("Arial", 11, "bold"))
     lbl_lista.pack(pady=(15, 5))
@@ -107,13 +104,13 @@ def abrir_ventana_musica():
 
     # Llenar la lista con tu Playlist
     rutas_ordenadas = []
-    for key in sorted(PLAYLIST.keys()):  # Ordenar por número 1, 2, 3...
+    for key in sorted(PLAYLIST.keys()):  
         ruta = PLAYLIST[key]
         nombre_archivo = os.path.basename(ruta)
         lista_box.insert(tk.END, f"{key}. {nombre_archivo}")
         rutas_ordenadas.append(ruta)
 
-    # --- Consola de Música ---
+    # --- Consola de musica ---
     txt_consola_musica = tk.Text(
         ventana_musica, height=12, width=60, bg="black", fg="#00FF00", font=("Consolas", 9))
     txt_consola_musica.pack(pady=10, padx=10)
