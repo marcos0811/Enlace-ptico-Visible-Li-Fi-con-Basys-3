@@ -1,0 +1,85 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity codificador is
+    Port (
+        clk          : in  STD_LOGIC;                    
+        dato_entrada : in  STD_LOGIC_VECTOR(7 downto 0);  -- el ascci
+        dato_valido  : in  STD_LOGIC;                     -- valor de inicio enviado desde uart
+        bit_tx       : out STD_LOGIC;                     -- bit a transmitir
+        ocupado      : out STD_LOGIC                      -- Codificador activo
+    );
+end codificador;
+
+architecture Behavioral of codificador is
+    constant BIT_PERIOD : integer := 41666; -- velocidad a tramsinitr
+
+    type estado_tipo is (ESPERA, START, DATOS, STOP, PAUSA); 
+    signal estado_actual : estado_tipo := ESPERA;
+
+    signal contador    : integer range 0 to BIT_PERIOD := 0; 
+    signal indice_bit  : integer range 0 to 7 := 0;
+    signal registro    : STD_LOGIC_VECTOR(7 downto 0);
+    signal contador_pausa : integer range 0 to 50000 := 0;
+
+begin
+    process(clk)
+    begin
+        if rising_edge(clk) then
+            case estado_actual is
+                when ESPERA =>
+                    ocupado <= '0'; --
+                    bit_tx  <= '1'; -- dejamos el laser encendido
+                    contador <= 0; --reiniciamos el contador
+                    indice_bit <= 0;  --reiniciamos el bit del indice
+                    
+                    if dato_valido = '1' then
+                        registro <= dato_entrada;
+                        estado_actual <= START;
+                    end if;
+
+                when START =>
+                    ocupado <= '1'; --no aceptamos mas letras
+                    bit_tx <= '0'; -- apagamos el laser para comensar a transmitir
+                    if contador = BIT_PERIOD-1 then -- dejamos un tiempo apagado antes de transmitir los daots
+                        contador <= 0; --reinciimos el contador
+                        estado_actual <= DATOS; --pasasmos el asiguiente esearo
+                    else
+                        contador <= contador + 1;
+                    end if;
+
+                when DATOS =>
+                    bit_tx <= registro(indice_bit);
+                    if contador = BIT_PERIOD-1 then
+                        contador <= 0;
+                        if indice_bit = 7 then -- nos quedamos en datos hasta enviar los 7 bits
+                            estado_actual <= STOP; --pasamos al siguiente estado
+                        else
+                            indice_bit <= indice_bit + 1; --actualizamos el contador del indice
+                        end if;
+                    else
+                        contador <= contador + 1; --actualizamos el contador
+                    end if;
+
+                when STOP =>
+                    bit_tx <= '1'; -- encendemos el laser
+                    if contador = BIT_PERIOD-1 then  -- esperamos antes de pasar al siguiente estado
+                        contador <= 0; -- reiniciamos el contador¿
+                        estado_actual <= PAUSA; --pasamos al sigueinte stados
+                    else
+                        contador <= contador + 1;
+                    end if;
+
+                when PAUSA =>
+                    bit_tx <= '1'; --encendemos el laser
+                    if contador_pausa = BIT_PERIOD-1 then --esperamos un tiempo 
+                        contador_pausa <= 0; --reincioamo el contador
+                        estado_actual <= ESPERA; --pasamos al sigueinte estado
+                    else
+                        contador_pausa <= contador_pausa + 1; --actualimzaos el contador
+                    end if;
+            end case;
+        end if;
+    end process;
+end Behavioral;
