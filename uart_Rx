@@ -1,0 +1,125 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+-- Uncomment the following library declaration if using
+-- arithmetic functions with Signed or Unsigned values
+use IEEE.NUMERIC_STD.ALL;
+
+-- Uncomment the following library declaration if instantiating
+-- any Xilinx leaf cells in this code.
+--library UNISIM;
+--use UNISIM.VComponents.all;
+
+entity modulo_uart is
+    Generic (
+        -- 100,000,000 / 9600 = 10416 ciclos por bit
+        CLK_PER_BIT : integer := 41666
+    );
+    Port (
+        clk      : in  std_logic;                    -- Reloj W5 (100MHz)
+        reset    : in  std_logic;                    -- Botón de reset (U18)
+        rx_input : in  std_logic;                    -- Señal desde el VS1838 (J1)
+        data_out : out std_logic_vector(7 downto 0); -- Byte reconstruido
+        rx_ready : out std_logic                     -- Pulso de "Dato Listo"
+    );
+end modulo_uart;
+
+architecture Behavioral of modulo_uart is
+
+    -- Estados de la FSM
+    type t_estado is (ST_IDLE, ST_START_BIT, ST_DATA_BITS, ST_STOP_BIT, ST_CLEANUP);
+    signal estado_actual : t_estado := ST_IDLE;
+
+    -- Señales para Sincronización (Evita Metaestabilidad)
+    signal rx_sync   : std_logic_vector(1 downto 0) := "11";
+    signal rx_stable : std_logic := '1';
+
+    -- Contadores y Registros
+    signal clk_count  : integer range 0 to CLK_PER_BIT - 1 := 0;
+    signal bit_index  : integer range 0 to 7 := 0; 
+    signal rx_byte    : std_logic_vector(7 downto 0) := (others => '0');
+
+begin
+
+    -- 1. ETAPA DE SINCRONIZACIÓN
+    -- Filtramos la señal asíncrona que viene del sensor VS1838
+    p_SYNC : process(clk)
+    begin
+        if rising_edge(clk) then
+            rx_sync <= rx_sync(0) & rx_input;
+            rx_stable <= rx_sync(1); 
+        end if;
+    end process;
+
+    -- 2. PROCESO PRINCIPAL DE RECEPCIÓN
+    p_UART_RX : process(clk)
+    begin
+        if rising_edge(clk) then
+            if reset = '1' then
+                estado_actual <= ST_IDLE;
+                rx_ready      <= '0';
+                clk_count     <= 0;
+            else
+                case estado_actual is
+
+                    -- ESPERA DE INICIO: VS1838 da '0' cuando hay luz
+                    when ST_IDLE =>
+                        rx_ready  <= '0';
+                        clk_count <= 0;
+                        bit_index <= 0;
+                        if rx_stable = '0' then -- Bit de Inicio detectado
+                            estado_actual <= ST_START_BIT;
+                        end if;
+
+                    -- VALIDACIÓN: Muestreo a la mitad para asegurar que no es ruido
+                    when ST_START_BIT =>
+                        if clk_count = (CLK_PER_BIT / 2) then
+                            if rx_stable = '0' then
+                                clk_count <= 0;
+                                estado_actual <= ST_DATA_BITS;
+                            else
+                                estado_actual <= ST_IDLE;
+                            end if;
+                        else
+                            clk_count <= clk_count + 1;
+                        end if;
+
+                    -- CAPTURA DE LOS 8 BITS (8-N-1)
+                    when ST_DATA_BITS =>
+                        if clk_count < CLK_PER_BIT - 1 then
+                            clk_count <= clk_count + 1;
+                        else
+                            clk_count <= 0;
+                            rx_byte(bit_index) <= rx_stable; -- Guardamos el bit recibido
+                            
+                            if bit_index < 7 then
+                                bit_index <= bit_index + 1;
+                            else
+                                bit_index <= 0;
+                                estado_actual <= ST_STOP_BIT;
+                            end if;
+                        end if;
+
+                    -- VERIFICACIÓN DEL STOP BIT (Debe ser '1'/Oscuridad)
+                    when ST_STOP_BIT =>
+                        if clk_count < CLK_PER_BIT - 1 then
+                            clk_count <= clk_count + 1;
+                        else
+                            estado_actual <= ST_CLEANUP;
+                        end if;
+
+                    -- ENTREGA DE DATOS A LA UART TX
+                    when ST_CLEANUP =>
+                        data_out      <= rx_byte;
+                        rx_ready      <= '1'; -- Dispara la transmisión a la PC
+                        estado_actual <= ST_IDLE;
+
+                    when others =>
+                        estado_actual <= ST_IDLE;
+
+                end case;
+            end if;
+        end if;
+    end process p_UART_RX;
+
+end Behavioral;
